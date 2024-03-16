@@ -2,4 +2,5 @@
 
 (def default-db
   {:name "re-frame"
-   :count 0})
+   :count 0
+   :last-tick (str (js/Date.))})

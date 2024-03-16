@@ -6,11 +6,11 @@
    ))
 
 (defn main-panel []
-  (let [name (re-frame/subscribe [::subs/name])]
+  (let [time (re-frame/subscribe [::subs/time])]
     [:div
      [:h1
       {:class (styles/level1)}
-      "Hello from " @name]
+      "Hello from " @time]
      [:h1 "Money: "]
      [:h1 "Houses: "]
      [:h1 "People: "]

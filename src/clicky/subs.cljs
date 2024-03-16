@@ -8,6 +8,6 @@
    (:name db)))
 
 (re-frame/reg-sub
- ::count
+ ::time
  (fn [db]
-   (:count db)))
+   (:last-tick db)))

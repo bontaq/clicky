@@ -8,3 +8,9 @@
  ::initialize-db
  (fn [_ _]
    db/default-db))
+
+(re-frame/reg-event-db
+ :update-last-tick
+ (fn [db [_ new-timestamp]]
+   (assoc db :last-tick new-timestamp)))
+
