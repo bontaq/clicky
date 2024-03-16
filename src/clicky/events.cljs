@@ -14,6 +14,6 @@
  (fn [db [_ new-timestamp]]
    (-> db
         (assoc :last-tick new-timestamp)
-        ;;(assoc-in [:counts :people] 5)
+        (assoc-in [:counts :people] 5)
         )
    ))

@@ -7,4 +7,6 @@
    :counts {:people 2
             :food 10
             :wood 10}
+   :work {:wood 0
+          :food 0}
    })

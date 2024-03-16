@@ -12,6 +12,9 @@
 (def plus
   [:span {:dangerouslySetInnerHTML {:__html (.toSvg feather/icons.plus)}}])
 
+(def tool
+  [:span {:dangerouslySetInnerHTML {:__html (.toSvg feather/icons.tool)}}])
+
 (def person
   [:span {:dangerouslySetInnerHTML {:__html (.toSvg feather/icons.meh)}}])
 
@@ -50,8 +53,11 @@
      ;; [:h1 "Houses: "]
 
      [:h1 "Food: " (:food @counts)]
+     (repeat (:food @counts) food)
      [:h1 "Wood: " (:wood @counts)]
+     (repeat (:wood @counts) tool)
      [:h1 "People: " (:people @counts)]
+     (repeat (:people @counts) person)
 
      ;; [:h1 "Water: "]
      ;; [:h1 "Furnaces: "]
