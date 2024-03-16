@@ -6,6 +6,7 @@
    [clicky.views :as views]
    [clicky.config :as config]
    [cljs.core.async :refer [chan go timeout <! close!]]
+   ["feather-icons" :as feather]
    ))
 
 (defn dev-setup []
@@ -42,4 +43,5 @@
   (re-frame/dispatch-sync [::events/initialize-db])
   (dev-setup)
   (mount-root)
-  (reset! stop-ticking (start-ticking!)))
+  (reset! stop-ticking (start-ticking!))
+  )
