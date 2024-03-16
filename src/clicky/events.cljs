@@ -12,5 +12,8 @@
 (re-frame/reg-event-db
  :update-last-tick
  (fn [db [_ new-timestamp]]
-   (assoc db :last-tick new-timestamp)))
-
+   (-> db
+        (assoc :last-tick new-timestamp)
+        ;;(assoc-in [:counts :people] 5)
+        )
+   ))

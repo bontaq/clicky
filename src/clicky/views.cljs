@@ -9,25 +9,52 @@
 (def house
   [:span {:dangerouslySetInnerHTML {:__html (.toSvg feather/icons.home)}}])
 
+(def plus
+  [:span {:dangerouslySetInnerHTML {:__html (.toSvg feather/icons.plus)}}])
+
+(def person
+  [:span {:dangerouslySetInnerHTML {:__html (.toSvg feather/icons.meh)}}])
+
+(def food
+  [:span {:dangerouslySetInnerHTML {:__html (.toSvg feather/icons.twitter)}}])
+
+(defn buy-house []
+  [:div
+   [:p "count"]
+   [:div plus house]
+   [:p "price"]])
+
 (defn shop []
   [:div
-   house
-   [:svg {:class (styles/feather)}
-    (str feather/icons.home)]
-   [:h1 "Buy house"]])
+   [buy-house]
+   ])
+
+(defn assignments []
+  [:div
+   [:h2 "assignments"]
+   ])
 
 (defn main-panel []
-  (let [time (re-frame/subscribe [::subs/time])]
+  (let
+      [time (re-frame/subscribe [::subs/time])
+       counts (re-frame/subscribe [::subs/counts])]
     [:div
-     [shop]
-     [:h1
+     [:h3
       {:class (styles/level1)}
-      "Hello from " @time]
-     [:h1 "Money: "]
-     [:h1 "Houses: "]
-     [:h1 "Food: "]
-     [:h1 "Wood: "]
-     [:h1 "People: "]
-     [:h1 "Water: "]
-     [:h1 "Furnaces: "]
-     [:h1 "Mines: "]]))
+      @time]
+
+     [shop]
+
+     [assignments]
+     ;; [:h1 "Money: "]
+     ;; [:h1 "Houses: "]
+
+     [:h1 "Food: " (:food @counts)]
+     [:h1 "Wood: " (:wood @counts)]
+     [:h1 "People: " (:people @counts)]
+
+     ;; [:h1 "Water: "]
+     ;; [:h1 "Furnaces: "]
+     ;; [:h1 "Mines: "]
+
+     ]))

@@ -6,7 +6,6 @@
    [clicky.views :as views]
    [clicky.config :as config]
    [cljs.core.async :refer [chan go timeout <! close!]]
-   ["feather-icons" :as feather]
    ))
 
 (defn dev-setup []

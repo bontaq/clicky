@@ -11,3 +11,8 @@
  ::time
  (fn [db]
    (:last-tick db)))
+
+(re-frame/reg-sub
+ ::counts
+ (fn [db]
+   (:counts db)))
