@@ -43,5 +43,4 @@
   (re-frame/dispatch-sync [::events/initialize-db])
   (dev-setup)
   (mount-root)
-  (reset! stop-ticking (start-ticking!))
-  )
+  (reset! stop-ticking (start-ticking!)))

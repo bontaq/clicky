@@ -25,6 +25,7 @@
       "Hello from " @time]
      [:h1 "Money: "]
      [:h1 "Houses: "]
+     [:h1 "Food: "]
      [:h1 "Wood: "]
      [:h1 "People: "]
      [:h1 "Water: "]
