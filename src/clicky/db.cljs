@@ -28,9 +28,7 @@
    :workers (vec (repeatedly 5 mk-worker))
    :last-tick (str (js/Date.))
    :towers (vec (repeat 10 nil))
-   :counts {:people 2
-            :food 10
-            :wood 10}
+   :counts { :grey 100 }
    :work {:wood 0
           :food 0}
    })

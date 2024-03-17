@@ -12,10 +12,11 @@
 (re-frame/reg-event-db
  :update-last-tick
  (fn [db [_ new-timestamp]]
-   (-> db
-        (assoc :last-tick new-timestamp)
-        (assoc-in [:counts :people] 5)
-        )
+   (let [new-blocks (reduce + (map (fn [tower] (count (:workers tower))) (:towers db)))]
+     (-> db
+         (assoc :last-tick new-timestamp)
+         (update-in [:counts :grey] (fn [amt] (+ amt new-blocks)))
+         ))
    ))
 
 (defn mk-new-tower []
@@ -23,7 +24,7 @@
     {:key (str (random-uuid))
      :height height
      :workers []
-     :type :green}))
+     :type :grey}))
 
 (defn get-unused-location [towers]
   (let [open-spots (map first
@@ -40,7 +41,9 @@
          newTower (mk-new-tower)]
      (if (nil? location)
        db
-       (assoc-in db [:towers location] newTower)))))
+       (-> db
+           (assoc-in [:towers location] newTower)
+           (update-in [:counts :grey] (fn [amt] (- amt 100))))))))
 
 (def worker-options
   ["👨🏽", "👨", "👩🏽", "👩"])

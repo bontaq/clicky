@@ -49,27 +49,35 @@
          :key (str (random-uuid))}
    (rand-nth worker-options)])
 
-
 (defn buy-cube []
-  [:div {:class (styles/buy)
+  [:div {:class (styles/buy-tower)
          :on-click #(rf/dispatch [:new-tower])}
-   [:p "count"]
-   [:div plus house]
-   [:p "price"]])
+   [:div [box 45]]
+   [:p "100"]])
 
 (defn shop []
-  [:div
+  [:div {:class (styles/buy)}
    [buy-cube]])
+
+(defn bank []
+  (let [counts (rf/subscribe [::subs/counts])]
+    [:div
+     [:div
+      [box 30]
+      [:div {:style {:top -10 :left 10 :position "relative" :display "inline-block"}}
+       (:grey @counts)]]]))
 
 (defn worker-ctrl [tower]
   [:div {:style {:margin-left 5 :display "flex" :flex-direction "column"}}
 
    [:div
-    {:on-click #(rf/dispatch [:add-worker (:key tower)])}
+    {:on-click #(rf/dispatch [:add-worker (:key tower)])
+     :class (styles/hover)}
     plus]
 
    [:div
-    {:on-click #(rf/dispatch [:remove-worker (:key tower)])}
+    {:on-click #(rf/dispatch [:remove-worker (:key tower)])
+     :class (styles/hover)}
     minus]
 
    [:div {:style {:margin-left 5 :font-size 24}} (count (:workers tower))]
@@ -120,12 +128,6 @@
                    :align-items "flex-end"}}
      (map mk-tower @towers)]))
 
-;; just display the unassigned workers for now
-;; (defn mk-worker []
-;;   [:div {:style {:margin 5 :font-size "34px"}
-;;          :key (str (random-uuid))}
-;;    (rand-nth worker-options)])
-
 (defn workers []
   (let [workers (rf/subscribe [::subs/workers])]
     [:div
@@ -142,12 +144,13 @@
         {:class (styles/level1)}
         @time]
 
+       [bank]
+
        [shop]
 
-       [:div {:style {:display "flex"}}
+       [:div {:style {:display "flex" :align-items "center"}}
 
         [:div
-         [:h3 "workers"]
          [workers]]
 
         ;; [assignments]

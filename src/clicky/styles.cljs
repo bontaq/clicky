@@ -45,8 +45,24 @@
    :stroke-linejoin "round"
    :fill "none"})
 
+(defclass buy-tower
+  []
+  [:&
+   {:padding "10px"
+    :text-align "center"
+    :border "1px solid #D9D9D9"
+    :border-radius "5px"}
+   [:&:hover {:cursor "pointer"}]])
+
 (defclass buy
   []
   [:&
-   {:border "1px solid black"}
+   {:margin "60px"
+    :display "flex"
+    :justify-content "center"}
+   ])
+
+(defclass hover
+  []
+  [:&
    [:&:hover {:cursor "pointer"}]])
