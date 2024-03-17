@@ -25,11 +25,17 @@
      :workers 0
      :type :green}))
 
+(defn get-unused-location [towers]
+  (rand-nth
+   (map first
+        (filter (fn [[index isNil]] isNil)
+                (map-indexed (fn [index val] [index (nil? val)]) towers)))))
+
 (re-frame/reg-event-db
  :new-tower
  (fn [db _]
-   ;; TODO: this shouldn't replace an existing tower
-   (let [location (rand-int (count (:towers db)))
+   ;; TODO: this should not throw an error if nothing available
+   (let [location (get-unused-location (:towers db))
          newTower (mk-new-tower)]
      (assoc-in db [:towers location] newTower))))
 
