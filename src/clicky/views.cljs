@@ -59,17 +59,27 @@
 
 (defn shop []
   [:div
-   [buy-cube]
-   ])
+   [buy-cube]])
 
 (defn worker-ctrl [tower]
   [:div {:style {:margin-left 5 :display "flex" :flex-direction "column"}}
-   [:div {:on-click #(rf/dispatch [:add-worker (:key tower)])} plus]
-   [:div {} minus]
-   [:div {:style {:margin-left 5 :font-size 24}} (:workers tower)]
+
+   [:div
+    {:on-click #(rf/dispatch [:add-worker (:key tower)])}
+    plus]
+
+   [:div
+    {:on-click #(rf/dispatch [:remove-worker (:key tower)])}
+    minus]
+
+   [:div {:style {:margin-left 5 :font-size 24}} (count (:workers tower))]
+
    [:div {:style {:position "absolute" :top 526 :margin-left -7
                   :display "flex" :flex-direction "column"}}
-    (repeatedly (:workers tower) mk-worker)]])
+    (map (fn [worker] [:div
+                      {:style {:font-size "34px" :margin-left 5}}
+                      (:emoji worker)])
+         (:workers tower))]])
 
 
 ;; so I think here, we'll have it generate and set its own height?
@@ -111,10 +121,17 @@
      (map mk-tower @towers)]))
 
 ;; just display the unassigned workers for now
+;; (defn mk-worker []
+;;   [:div {:style {:margin 5 :font-size "34px"}
+;;          :key (str (random-uuid))}
+;;    (rand-nth worker-options)])
+
 (defn workers []
-  (let [workerCount (rf/subscribe [::subs/workers])]
+  (let [workers (rf/subscribe [::subs/workers])]
     [:div
-     (repeatedly @workerCount mk-worker)]))
+     (map
+      (fn [worker] [:div {:style {:margin 5 :font-size "34px"}} (:emoji worker)])
+      @workers)]))
 
 (defn main-panel []
   (let

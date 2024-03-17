@@ -22,7 +22,7 @@
   (let [height (+ 35 (rand-int 300))]
     {:key (str (random-uuid))
      :height height
-     :workers 0
+     :workers []
      :type :green}))
 
 (defn get-unused-location [towers]
@@ -42,17 +42,44 @@
        db
        (assoc-in db [:towers location] newTower)))))
 
-(defn increment-tower [towerKey tower]
-  (if (= towerKey (:key tower))
-    (update tower :workers inc)
+(def worker-options
+  ["👨🏽", "👨", "👩🏽", "👩"])
+
+(defn mk-worker []
+  {:emoji (rand-nth worker-options)
+   :key (random-uuid)})
+
+(defn add-worker-to-tower [worker tower-key tower]
+  (if (= tower-key (:key tower))
+    (assoc tower :workers (conj (:workers tower) worker))
     tower))
 
 (re-frame/reg-event-db
  :add-worker
- (fn [db [_ towerKey]]
-   (let [towers (:towers db)]
-     (when (< 0 (:workers db))
+ (fn [db [_ tower-key]]
+   (when (< 0 (count (:workers db)))
+     (let [towers (:towers db)
+           worker (first (:workers db))
+           new-workers (rest (:workers db))]
        (-> db
            (assoc-in [:towers]
-                     (vec (map (fn [tower] (increment-tower towerKey tower)) towers)))
-           (update :workers dec))))))
+                     (vec (map (fn [tower] (add-worker-to-tower worker tower-key tower)) towers)))
+           (assoc :workers new-workers))))))
+
+(defn remove-worker-from-tower [tower-key tower]
+  (if (= tower-key (:key tower))
+    (assoc tower :workers (rest (:workers tower)))
+    tower))
+
+(re-frame/reg-event-db
+ :remove-worker
+ (fn [db [_ tower-key]]
+   (let [towers (:towers db)
+         tower (first (filter (fn [tower] (= (:key tower) tower-key)) towers))
+         worker (first (:workers tower))]
+     (when (not (nil? worker))
+       (-> db
+           (assoc :towers
+                  (vec
+                   (map (fn [tower] (remove-worker-from-tower tower-key tower)) towers)))
+           (assoc :workers (conj (:workers db) worker)))))))

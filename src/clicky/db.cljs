@@ -14,10 +14,18 @@
 
 (s/def ::tower (s/keys :req-un [::height ::workers ::kind]))
 
+;; { emoji, key }
+(def worker-options
+  ["👨🏽", "👨", "👩🏽", "👩"])
+
+(defn mk-worker []
+  {:emoji (rand-nth worker-options)
+   :key (str (random-uuid))})
+
 (def default-db
   {:name "re-frame"
    :count 0
-   :workers 5
+   :workers (vec (repeatedly 5 mk-worker))
    :last-tick (str (js/Date.))
    :towers (vec (repeat 10 nil))
    :counts {:people 2
