@@ -9,6 +9,11 @@
  (fn [_ _]
    db/default-db))
 
+(defn new-tower-height [tower]
+  (when (not (nil? tower))
+    (update tower :height
+            (fn [height] (- height (count (:workers tower)))))))
+
 (re-frame/reg-event-db
  :update-last-tick
  (fn [db [_ new-timestamp]]
@@ -16,6 +21,9 @@
      (-> db
          (assoc :last-tick new-timestamp)
          (update-in [:counts :grey] (fn [amt] (+ amt new-blocks)))
+         (update-in [:towers] (fn [towers] (vec (map
+                                                new-tower-height
+                                                towers))))
          ))
    ))
 
