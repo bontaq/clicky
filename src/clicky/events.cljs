@@ -26,18 +26,21 @@
      :type :green}))
 
 (defn get-unused-location [towers]
-  (rand-nth
-   (map first
-        (filter (fn [[index isNil]] isNil)
-                (map-indexed (fn [index val] [index (nil? val)]) towers)))))
+  (let [open-spots (map first
+                        (filter (fn [[index isNil]] isNil)
+                                (map-indexed (fn [index val] [index (nil? val)]) towers)))]
+    (if (empty? open-spots)
+      nil
+      (rand-nth open-spots))))
 
 (re-frame/reg-event-db
  :new-tower
  (fn [db _]
-   ;; TODO: this should not throw an error if nothing available
    (let [location (get-unused-location (:towers db))
          newTower (mk-new-tower)]
-     (assoc-in db [:towers location] newTower))))
+     (if (nil? location)
+       db
+       (assoc-in db [:towers location] newTower)))))
 
 (defn increment-tower [towerKey tower]
   (if (= towerKey (:key tower))
@@ -48,6 +51,8 @@
  :add-worker
  (fn [db [_ towerKey]]
    (let [towers (:towers db)]
-     (do
-       (assoc-in db [:towers]
-                 (vec (map (fn [tower] (increment-tower towerKey tower)) towers)))))))
+     (when (< 0 (:workers db))
+       (-> db
+           (assoc-in [:towers]
+                     (vec (map (fn [tower] (increment-tower towerKey tower)) towers)))
+           (update :workers dec))))))

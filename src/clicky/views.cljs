@@ -41,6 +41,15 @@
 (def food
   [:span {:dangerouslySetInnerHTML {:__html (.toSvg feather/icons.twitter)}}])
 
+(def worker-options
+  ["👨🏽", "👨", "👩🏽", "👩"])
+
+(defn mk-worker []
+  [:div {:style {:margin 5 :font-size "34px"}
+         :key (str (random-uuid))}
+   (rand-nth worker-options)])
+
+
 (defn buy-cube []
   [:div {:class (styles/buy)
          :on-click #(rf/dispatch [:new-tower])}
@@ -53,11 +62,14 @@
    [buy-cube]
    ])
 
-(defn add-worker [tower]
+(defn worker-ctrl [tower]
   [:div {:style {:margin-left 5 :display "flex" :flex-direction "column"}}
    [:div {:on-click #(rf/dispatch [:add-worker (:key tower)])} plus]
-   [:div {} minus]])
-
+   [:div {} minus]
+   [:div {:style {:margin-left 5 :font-size 24}} (:workers tower)]
+   [:div {:style {:position "absolute" :top 526 :margin-left -7
+                  :display "flex" :flex-direction "column"}}
+    (repeatedly (:workers tower) mk-worker)]])
 
 
 ;; so I think here, we'll have it generate and set its own height?
@@ -74,8 +86,8 @@
                         :height (:height @tower)}
                 :on-click #(reset! clicked true)}
           (box (:height @tower))]
-         [add-worker @tower]
-         [:p (:workers @tower)]])
+         [worker-ctrl @tower]
+         ])
 
       :component-did-update
       (fn [this]
@@ -83,7 +95,7 @@
           (js/setTimeout #(reset! clicked false) 250)))})))
 
 (defn spacer [key]
-  [:div {:style {:width 45} :key key}])
+  [:div {:style {:width 45}}])
 
 (defn mk-tower [tower]
   (if (nil? tower) [spacer (:key tower)] [cube (:key tower)]))
@@ -97,14 +109,6 @@
                    :display "flex"
                    :align-items "flex-end"}}
      (map mk-tower @towers)]))
-
-(def worker-options
-  ["👨🏽", "👨", "👩🏽", "👩"])
-
-(defn mk-worker []
-  [:div {:style {:margin 5 :font-size "34px"}
-         :key (str (random-uuid))}
-   (rand-nth worker-options)])
 
 ;; just display the unassigned workers for now
 (defn workers []
