@@ -1,10 +1,27 @@
 (ns clicky.views
   (:require
-   [re-frame.core :as re-frame]
+   [re-frame.core :as rf]
+   [reagent.core :as r]
    [clicky.styles :as styles]
    [clicky.subs :as subs]
    ["feather-icons" :as feather]
+   [garden.core :refer [css]]
    ))
+
+(defn box [height]
+  [:svg {:viewBox "0 0 32 28"
+         :fill "none"
+         :xmlns "http://www.w3.org/2000/svg"
+         :preserveAspectRatio "none"
+         :width "45px"
+         :height height}
+   [:rect {:y "4", :width "24", :height "24", :fill "#D9D9D9", :fill-opacity "0.5"}]
+   [:path {:d "M8.5 0H31.5L24 4H0L8.5 0Z", :fill "#D9D9D9", :fill-opacity "0.25"}]
+   [:path {:d "M24 4L31.5 0V24L24 28V4Z", :fill "#D9D9D9", :fill-opacity "1"}]])
+
+(def animatedBox
+  [:div {:class (styles/bounceClass)}
+   box])
 
 (def house
   [:span {:dangerouslySetInnerHTML {:__html (.toSvg feather/icons.home)}}])
@@ -21,46 +38,85 @@
 (def food
   [:span {:dangerouslySetInnerHTML {:__html (.toSvg feather/icons.twitter)}}])
 
-(defn buy-house []
-  [:div
+(defn buy-cube []
+  [:div {:class (styles/buy)
+         :on-click #(rf/dispatch [:new-tower])}
    [:p "count"]
    [:div plus house]
    [:p "price"]])
 
 (defn shop []
   [:div
-   [buy-house]
+   [buy-cube]
    ])
+
+;; so I think here, we'll have it generate and set its own height?
+;; clicking will have to assign a worker
+(defn cube [tower]
+  (let [clicked (r/atom false)]
+    (r/create-class
+     {:reagent-render
+      (fn []
+        [:div {:class (if @clicked (styles/bounceClass) "")
+               :style {:display "inline-block"
+                       :height (:height tower)}
+               :on-click #(reset! clicked true)}
+         (box (:height tower))])
+
+      :component-did-update
+      (fn [this]
+        (when (= true @clicked)
+          (js/setTimeout #(reset! clicked false) 250)))})))
 
 (defn assignments []
   [:div
    [:h2 "assignments"]
    ])
 
+(defn spacer []
+  [:div {:style {:width 45}}])
+
+(defn mk-tower [tower]
+  (if (nil? tower) [spacer] [cube tower]))
+
+(defn game []
+  (let [towers (rf/subscribe [::subs/towers])]
+    [:div {:style {:width "726px"
+                   :min-height "512px"
+                   :margin "0 auto"
+                   :position "relative"
+                   :display "flex"
+                   :align-items "flex-end"}}
+     (map mk-tower @towers)]))
+
 (defn main-panel []
   (let
-      [time (re-frame/subscribe [::subs/time])
-       counts (re-frame/subscribe [::subs/counts])]
-    [:div
-     [:h3
-      {:class (styles/level1)}
-      @time]
+      [time (rf/subscribe [::subs/time])
+       counts (rf/subscribe [::subs/counts])]
+      [:div
+       [:h3
+        {:class (styles/level1)}
+        @time]
 
-     [shop]
+       [shop]
 
-     [assignments]
-     ;; [:h1 "Money: "]
-     ;; [:h1 "Houses: "]
+       ;; [assignments]
+       ;; [:h1 "Money: "]
+       ;; [:h1 "Houses: "]
+       ;;
 
-     [:h1 "Food: " (:food @counts)]
-     (repeat (:food @counts) food)
-     [:h1 "Wood: " (:wood @counts)]
-     (repeat (:wood @counts) tool)
-     [:h1 "People: " (:people @counts)]
-     (repeat (:people @counts) person)
 
-     ;; [:h1 "Water: "]
-     ;; [:h1 "Furnaces: "]
-     ;; [:h1 "Mines: "]
+       ;; [:h1 "Food: " (:food @counts)]
+       ;; (repeat (:food @counts) food)
+       ;; [:h1 "Wood: " (:wood @counts)]
+       ;; (repeat (:wood @counts) tool)
+       ;; [:h1 "People: " (:people @counts)]
+       ;; (repeat (:people @counts) person)
 
-     ]))
+       [game]
+
+       ;; [:h1 "Water: "]
+       ;; [:h1 "Furnaces: "]
+       ;; [:h1 "Mines: "]
+
+       ]))

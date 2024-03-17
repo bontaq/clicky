@@ -16,3 +16,8 @@
  ::counts
  (fn [db]
    (:counts db)))
+
+(re-frame/reg-sub
+ ::towers
+ (fn [db]
+   (:towers db)))
