@@ -21,3 +21,13 @@
  ::towers
  (fn [db]
    (:towers db)))
+
+(re-frame/reg-sub
+ ::workers
+ (fn [db]
+   (:workers db)))
+
+(re-frame/reg-sub
+ ::tower
+ (fn [db [_ tower-key]]
+   (first (filter (fn [tower] (= tower-key (:key tower))) (:towers db)))))

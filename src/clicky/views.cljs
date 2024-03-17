@@ -29,6 +29,9 @@
 (def plus
   [:span {:dangerouslySetInnerHTML {:__html (.toSvg feather/icons.plus)}}])
 
+(def minus
+  [:span {:dangerouslySetInnerHTML {:__html (.toSvg feather/icons.minus)}}])
+
 (def tool
   [:span {:dangerouslySetInnerHTML {:__html (.toSvg feather/icons.tool)}}])
 
@@ -50,34 +53,40 @@
    [buy-cube]
    ])
 
+(defn add-worker [tower]
+  [:div {:style {:margin-left 5 :display "flex" :flex-direction "column"}}
+   [:div {:on-click #(rf/dispatch [:add-worker (:key tower)])} plus]
+   [:div {} minus]])
+
+
+
 ;; so I think here, we'll have it generate and set its own height?
 ;; clicking will have to assign a worker
-(defn cube [tower]
-  (let [clicked (r/atom false)]
+(defn cube [tower-key]
+  (let [clicked (r/atom false)
+        tower (rf/subscribe [::subs/tower tower-key])]
     (r/create-class
      {:reagent-render
       (fn []
-        [:div {:class (if @clicked (styles/bounceClass) "")
-               :style {:display "inline-block"
-                       :height (:height tower)}
-               :on-click #(reset! clicked true)}
-         (box (:height tower))])
+        [:div
+         [:div {:class (if @clicked (styles/bounceClass) "")
+                :style {:display "inline-block"
+                        :height (:height @tower)}
+                :on-click #(reset! clicked true)}
+          (box (:height @tower))]
+         [add-worker @tower]
+         [:p (:workers @tower)]])
 
       :component-did-update
       (fn [this]
         (when (= true @clicked)
           (js/setTimeout #(reset! clicked false) 250)))})))
 
-(defn assignments []
-  [:div
-   [:h2 "assignments"]
-   ])
-
-(defn spacer []
-  [:div {:style {:width 45}}])
+(defn spacer [key]
+  [:div {:style {:width 45} :key key}])
 
 (defn mk-tower [tower]
-  (if (nil? tower) [spacer] [cube tower]))
+  (if (nil? tower) [spacer (:key tower)] [cube (:key tower)]))
 
 (defn game []
   (let [towers (rf/subscribe [::subs/towers])]
@@ -88,6 +97,20 @@
                    :display "flex"
                    :align-items "flex-end"}}
      (map mk-tower @towers)]))
+
+(def worker-options
+  ["👨🏽", "👨", "👩🏽", "👩"])
+
+(defn mk-worker []
+  [:div {:style {:margin 5 :font-size "34px"}
+         :key (str (random-uuid))}
+   (rand-nth worker-options)])
+
+;; just display the unassigned workers for now
+(defn workers []
+  (let [workerCount (rf/subscribe [::subs/workers])]
+    [:div
+     (repeatedly @workerCount mk-worker)]))
 
 (defn main-panel []
   (let
@@ -100,20 +123,26 @@
 
        [shop]
 
-       ;; [assignments]
-       ;; [:h1 "Money: "]
-       ;; [:h1 "Houses: "]
-       ;;
+       [:div {:style {:display "flex"}}
+
+        [:div
+         [:h3 "workers"]
+         [workers]]
+
+        ;; [assignments]
+        ;; [:h1 "Money: "]
+        ;; [:h1 "Houses: "]
+        ;;
 
 
-       ;; [:h1 "Food: " (:food @counts)]
-       ;; (repeat (:food @counts) food)
-       ;; [:h1 "Wood: " (:wood @counts)]
-       ;; (repeat (:wood @counts) tool)
-       ;; [:h1 "People: " (:people @counts)]
-       ;; (repeat (:people @counts) person)
+        ;; [:h1 "Food: " (:food @counts)]
+        ;; (repeat (:food @counts) food)
+        ;; [:h1 "Wood: " (:wood @counts)]
+        ;; (repeat (:wood @counts) tool)
+        ;; [:h1 "People: " (:people @counts)]
+        ;; (repeat (:people @counts) person)
 
-       [game]
+        [game]]
 
        ;; [:h1 "Water: "]
        ;; [:h1 "Furnaces: "]

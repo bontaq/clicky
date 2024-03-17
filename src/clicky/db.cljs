@@ -8,7 +8,7 @@
 ;; yeah so each tile could have a different
 ;; type of thing on it
 
-(s/def ::height (s/int-in -100 100))
+(s/def ::height (s/int-in -100 300))
 (s/def ::workers nat-int?)
 (s/def ::kind (s/and string? #(= "grey" %)))
 
@@ -17,6 +17,7 @@
 (def default-db
   {:name "re-frame"
    :count 0
+   :workers 5
    :last-tick (str (js/Date.))
    :towers (vec (repeat 10 nil))
    :counts {:people 2
