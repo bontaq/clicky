@@ -41,14 +41,6 @@
 (def food
   [:span {:dangerouslySetInnerHTML {:__html (.toSvg feather/icons.twitter)}}])
 
-(def worker-options
-  ["👨🏽", "👨", "👩🏽", "👩"])
-
-(defn mk-worker []
-  [:div {:style {:margin 5 :font-size "34px"}
-         :key (str (random-uuid))}
-   (rand-nth worker-options)])
-
 (defn buy-cube []
   [:div {:class (styles/buy-tower)
          :on-click #(rf/dispatch [:new-tower])}
@@ -103,7 +95,7 @@
                 :style {:display "inline-block"
                         :height (:height @tower)}
                 :on-click #(reset! clicked true)}
-          (box (:height @tower))]
+          (box (max 1 (:height @tower)))]
          [worker-ctrl @tower]
          ])
 
@@ -130,7 +122,7 @@
 
 (defn workers []
   (let [workers (rf/subscribe [::subs/workers])]
-    [:div
+    [:div {:style {:min-width "45px"}}
      (map
       (fn [worker] [:div {:style {:margin 5 :font-size "34px"}} (:emoji worker)])
       @workers)]))
@@ -140,7 +132,7 @@
       [time (rf/subscribe [::subs/time])
        counts (rf/subscribe [::subs/counts])]
 
-    [:div
+    [:div {:style {:margin "75px"}}
        ;; [:h3
        ;;  {:class (styles/level1)}
        ;;  @time]

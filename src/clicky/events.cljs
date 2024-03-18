@@ -11,19 +11,29 @@
 
 (defn new-tower-height [tower]
   (when (not (nil? tower))
-    (update tower :height
-            (fn [height] (- height (count (:workers tower)))))))
+    (if (> 0 (:height tower))
+      nil
+      (update tower :height
+              (fn [height] (- height (count (:workers tower))))))))
+
+(defn get-removed-workers [tower]
+  (when (not (nil? tower))
+    (if (> 0 (:height tower))
+      (:workers tower)
+      [])))
 
 (re-frame/reg-event-db
  :update-last-tick
  (fn [db [_ new-timestamp]]
-   (let [new-blocks (reduce + (map (fn [tower] (count (:workers tower))) (:towers db)))]
+   (let [new-blocks (reduce + (map (fn [tower] (count (:workers tower))) (:towers db)))
+         removed-workers (mapcat (fn [tower] (get-removed-workers tower)) (:towers db))]
      (-> db
          (assoc :last-tick new-timestamp)
          (update-in [:counts :grey] (fn [amt] (+ amt new-blocks)))
          (update-in [:towers] (fn [towers] (vec (map
                                                 new-tower-height
                                                 towers))))
+         (update-in [:workers] (fn [workers] (vec (concat workers removed-workers))))
          ))
    ))
 
