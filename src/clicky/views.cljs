@@ -139,10 +139,11 @@
   (let
       [time (rf/subscribe [::subs/time])
        counts (rf/subscribe [::subs/counts])]
-      [:div
-       [:h3
-        {:class (styles/level1)}
-        @time]
+
+    [:div
+       ;; [:h3
+       ;;  {:class (styles/level1)}
+       ;;  @time]
 
        [bank]
 
